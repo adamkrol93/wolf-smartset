@@ -1,17 +1,13 @@
-##Library to handle Wolf SmartSet communication.
+## Library to handle Wolf SmartSet communication.
 
-###Features:
+### Features:
 - Built-in authentication
 - Session creation
 - Fetch all devices you have
 - Fetch all parameters description
 - Fetch value for specific parameter
 
-###Transaltions
-Module will translate all parameter names from German.
-Supported languages: pl
-
-###Parameter descriptions
+### Parameter descriptions
 Parameters verified only for FGB-28 system.
 Other should work.
 Keep in mind that core implementation of fetching parameters is removing duplications by value_id and name.
