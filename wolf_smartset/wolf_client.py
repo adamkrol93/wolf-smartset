@@ -6,11 +6,11 @@ from httpx import Headers
 
 from wolf_smartset.constants import BASE_URL, ID, GATEWAY_ID, NAME, SYSTEM_ID, MENU_ITEMS, TAB_VIEWS, BUNDLE_ID, \
     BUNDLE, VALUE_ID_LIST, GUI_ID_CHANGED, SESSION_ID, VALUE_ID, VALUE, STATE, VALUES, PARAMETER_ID, UNIT, \
-    CELSIUS_TEMPERATURE, BAR, PERCENTAGE, LIST_ITEMS, DISPLAY_TEXT, PARAMETER_DESCRIPTORS, TAB_NAME
+    CELSIUS_TEMPERATURE, BAR, PERCENTAGE, LIST_ITEMS, DISPLAY_TEXT, PARAMETER_DESCRIPTORS, TAB_NAME, HOUR
 from wolf_smartset.create_session import create_session
 from wolf_smartset.helpers import bearer_header
 from wolf_smartset.models import Temperature, Parameter, SimpleParameter, Device, Pressure, ListItemParameter, \
-    PercentageParameter, Value, ListItem
+    PercentageParameter, Value, ListItem, HoursParameter
 from wolf_smartset.token_auth import Tokens, TokenAuth
 
 
@@ -67,7 +67,6 @@ class WolfClient:
         desc = await self.__request('get', 'api/portal/GetGuiDescriptionForGateway', params=payload)
         # 0 -> general view
         tab_views = desc[MENU_ITEMS][0][TAB_VIEWS]
-        print(tab_views)
         result = list(map(WolfClient._map_view, tab_views))
 
         result.reverse()
@@ -111,6 +110,8 @@ class WolfClient:
                 return Pressure(value_id, name, parent, parameter_id)
             elif unit == PERCENTAGE:
                 return PercentageParameter(value_id, name, parent, parameter_id)
+            elif unit == HOUR:
+                return HoursParameter(value_id, name, parent, parameter_id)
         elif LIST_ITEMS in parameter:
             items = list(
                 map(lambda list_item: ListItem(list_item[VALUE], list_item[DISPLAY_TEXT]),

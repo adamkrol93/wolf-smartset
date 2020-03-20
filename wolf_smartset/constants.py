@@ -28,6 +28,8 @@ NAME = 'Name'
 
 PERCENTAGE = '%'
 
+HOUR = 'Std'
+
 BAR = 'bar'
 
 CELSIUS_TEMPERATURE = '°C'

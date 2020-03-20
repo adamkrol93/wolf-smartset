@@ -128,6 +128,34 @@ class Pressure(UnitParameter):
         self._parameter_id = parameter_id
 
 
+class HoursParameter(UnitParameter):
+    @property
+    def unit(self):
+        return 'H'
+
+    @property
+    def parameter_id(self):
+        return self._parameter_id
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def value_id(self):
+        return self._value_id
+
+    @property
+    def parent(self):
+        return self._parent
+
+    def __init__(self, value_id: int, name: str, parent: str, parameter_id: int):
+        self._value_id = value_id
+        self._name = name
+        self._parent = parent
+        self._parameter_id = parameter_id
+
+
 class PercentageParameter(UnitParameter):
 
     @property
