@@ -31,4 +31,11 @@ class TokenAuth:
 
         resp = await session.post(constants.BASE_URL + "/connect/token2", data=data)
         json = resp.json()
+        if "error" in json:
+            raise InvalidAuth
         return Tokens(json.get("access_token"), json.get("refresh_token"), json.get("expires_in"))
+
+
+class InvalidAuth(Exception):
+    """Invalid username and password was passed"""
+    pass
