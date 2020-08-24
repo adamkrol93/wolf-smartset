@@ -2,6 +2,7 @@ import datetime
 from typing import Union
 
 import httpx
+import logging
 from httpx import Headers
 
 from wolf_smartset.constants import BASE_URL, ID, GATEWAY_ID, NAME, SYSTEM_ID, MENU_ITEMS, TAB_VIEWS, BUNDLE_ID, \
@@ -12,6 +13,8 @@ from wolf_smartset.helpers import bearer_header
 from wolf_smartset.models import Temperature, Parameter, SimpleParameter, Device, Pressure, ListItemParameter, \
     PercentageParameter, Value, ListItem, HoursParameter
 from wolf_smartset.token_auth import Tokens, TokenAuth
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class WolfClient:
@@ -59,15 +62,16 @@ class WolfClient:
     # api/portal/GetSystemList
     async def fetch_system_list(self) -> [Device]:
         system_list = await self.__request('get', 'api/portal/GetSystemList')
-        return list(map(lambda system: Device(system[ID], system[GATEWAY_ID], system[NAME]), system_list))
+        _LOGGER.debug('Fetched systems: %s', system_list)
+        return [Device(system[ID], system[GATEWAY_ID], system[NAME]) for system in system_list]
 
     # api/portal/GetGuiDescriptionForGateway?GatewayId={gateway_id}&SystemId={system_id}
     async def fetch_parameters(self, gateway_id, system_id) -> [Parameter]:
         payload = {GATEWAY_ID: gateway_id, SYSTEM_ID: system_id}
         desc = await self.__request('get', 'api/portal/GetGuiDescriptionForGateway', params=payload)
-        # 0 -> general view
+        _LOGGER.debug('Fetched parameters: %s', desc)
         tab_views = desc[MENU_ITEMS][0][TAB_VIEWS]
-        result = list(map(WolfClient._map_view, tab_views))
+        result = [WolfClient._map_view(view) for view in tab_views]
 
         result.reverse()
         distinct_ids = []
@@ -86,7 +90,7 @@ class WolfClient:
         data = {
             BUNDLE_ID: 1000,
             BUNDLE: False,
-            VALUE_ID_LIST: list(map(lambda param: param.value_id, parameters)),
+            VALUE_ID_LIST: [param.value_id for param in parameters],
             GATEWAY_ID: gateway_id,
             SYSTEM_ID: system_id,
             GUI_ID_CHANGED: True,
@@ -94,8 +98,10 @@ class WolfClient:
         }
         res = await self.__request('post', 'api/portal/GetParameterValues', json=data,
                                    headers={"Content-Type": "application/json"})
-        return list(
-            filter(None, map(lambda v: Value(v[VALUE_ID], v[VALUE], v[STATE]) if VALUE in v else None, res[VALUES])))
+
+        _LOGGER.debug('Fetched values: %s', res)
+
+        return [Value(v[VALUE_ID], v[VALUE], v[STATE]) for v in res[VALUES] if VALUE in v]
 
     @staticmethod
     def _map_parameter(parameter: dict, parent: str) -> Parameter:
@@ -113,18 +119,16 @@ class WolfClient:
             elif unit == HOUR:
                 return HoursParameter(value_id, name, parent, parameter_id)
         elif LIST_ITEMS in parameter:
-            items = list(
-                map(lambda list_item: ListItem(list_item[VALUE], list_item[DISPLAY_TEXT]),
-                    parameter[LIST_ITEMS]))
+            items = [ListItem(list_item[VALUE], list_item[DISPLAY_TEXT]) for list_item in parameter[LIST_ITEMS]]
             return ListItemParameter(value_id, name, parent, items, parameter_id)
         return SimpleParameter(value_id, name, parent, parameter_id)
 
     @staticmethod
     def _map_view(view: dict):
         if 'SVGHeatingSchemaConfigDevices' in view:
-            units = dict(map(lambda unit: (unit['valueId'], unit['unit']), filter(lambda name: 'unit' in name,
-                                                                                  view['SVGHeatingSchemaConfigDevices'][
-                                                                                      0]['parameters'])))
+            units = dict([(unit['valueId'], unit['unit']) for unit
+                          in view['SVGHeatingSchemaConfigDevices'][0]['parameters'] if 'unit' in unit])
+
             new_params = []
             for param in view[PARAMETER_DESCRIPTORS]:
                 if param[VALUE_ID] in units:
@@ -132,4 +136,4 @@ class WolfClient:
                 new_params.append(WolfClient._map_parameter(param, view[TAB_NAME]))
             return new_params
         else:
-            return list(map(lambda p: WolfClient._map_parameter(p, view[TAB_NAME]), view[PARAMETER_DESCRIPTORS]))
+            return [WolfClient._map_parameter(p, view[TAB_NAME]) for p in view[PARAMETER_DESCRIPTORS]]

@@ -223,7 +223,7 @@ class ListItemParameter(Parameter):
         self._parameter_id = parameter_id
 
     def __str__(self) -> str:
-        return super().__str__() + " items: " + ", ".join(map(lambda item: item.__str__(), self.items))
+        return super().__str__() + " items: " + ", ".join([item.__str__() for item in self.items])
 
 
 class Value:
