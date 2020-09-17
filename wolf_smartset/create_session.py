@@ -5,8 +5,8 @@ from wolf_smartset.helpers import bearer_header
 
 
 async def create_session(session: AsyncClient, token: str):
-    resp = await session.post(constants.BASE_URL + "/api/portal/CreateSession",
+    resp = await session.post(constants.BASE_URL + "/api/portal/CreateSession2",
                               headers=Headers({**bearer_header(token),
                                                **{"Content-Type": "application/json", "Content-Length": "0"}}))
 
-    return resp.text
+    return resp.json()['BrowserSessionId']

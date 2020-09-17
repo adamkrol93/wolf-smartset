@@ -24,6 +24,8 @@ MENU_ITEMS = 'MenuItems'
 
 GATEWAY_ID = "GatewayId"
 
+LAST_ACCESS = "LastAccess"
+
 NAME = 'Name'
 
 PERCENTAGE = '%'

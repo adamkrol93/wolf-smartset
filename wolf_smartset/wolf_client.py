@@ -7,7 +7,8 @@ from httpx import Headers
 
 from wolf_smartset.constants import BASE_URL, ID, GATEWAY_ID, NAME, SYSTEM_ID, MENU_ITEMS, TAB_VIEWS, BUNDLE_ID, \
     BUNDLE, VALUE_ID_LIST, GUI_ID_CHANGED, SESSION_ID, VALUE_ID, VALUE, STATE, VALUES, PARAMETER_ID, UNIT, \
-    CELSIUS_TEMPERATURE, BAR, PERCENTAGE, LIST_ITEMS, DISPLAY_TEXT, PARAMETER_DESCRIPTORS, TAB_NAME, HOUR
+    CELSIUS_TEMPERATURE, BAR, PERCENTAGE, LIST_ITEMS, DISPLAY_TEXT, PARAMETER_DESCRIPTORS, TAB_NAME, HOUR, \
+    LAST_ACCESS
 from wolf_smartset.create_session import create_session
 from wolf_smartset.helpers import bearer_header
 from wolf_smartset.models import Temperature, Parameter, SimpleParameter, Device, Pressure, ListItemParameter, \
@@ -20,11 +21,13 @@ _LOGGER = logging.getLogger(__name__)
 class WolfClient:
     session_id: int or None
     tokens: Tokens or None
+    last_access: datetime or None
 
     def __init__(self, username: str, password: str):
         self.tokens = None
         self.token_auth = TokenAuth(username, password)
         self.session_id = None
+        self.last_access = None
 
     async def __request(self, method: str, path: str, **kwargs) -> Union[dict, list]:
         await self.__authorize()
@@ -94,13 +97,14 @@ class WolfClient:
             GATEWAY_ID: gateway_id,
             SYSTEM_ID: system_id,
             GUI_ID_CHANGED: True,
-            SESSION_ID: self.session_id
+            SESSION_ID: self.session_id,
+            LAST_ACCESS: self.last_access
         }
         res = await self.__request('post', 'api/portal/GetParameterValues', json=data,
                                    headers={"Content-Type": "application/json"})
-
         _LOGGER.debug('Fetched values: %s', res)
 
+        self.last_access = res[LAST_ACCESS]
         return [Value(v[VALUE_ID], v[VALUE], v[STATE]) for v in res[VALUES] if VALUE in v]
 
     @staticmethod
