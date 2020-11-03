@@ -8,7 +8,7 @@ from httpx import Headers
 from wolf_smartset.constants import BASE_URL, ID, GATEWAY_ID, NAME, SYSTEM_ID, MENU_ITEMS, TAB_VIEWS, BUNDLE_ID, \
     BUNDLE, VALUE_ID_LIST, GUI_ID_CHANGED, SESSION_ID, VALUE_ID, VALUE, STATE, VALUES, PARAMETER_ID, UNIT, \
     CELSIUS_TEMPERATURE, BAR, PERCENTAGE, LIST_ITEMS, DISPLAY_TEXT, PARAMETER_DESCRIPTORS, TAB_NAME, HOUR, \
-    LAST_ACCESS
+    LAST_ACCESS, ERROR_CODE, ERROR_TYPE
 from wolf_smartset.create_session import create_session
 from wolf_smartset.helpers import bearer_header
 from wolf_smartset.models import Temperature, Parameter, SimpleParameter, Device, Pressure, ListItemParameter, \
@@ -22,12 +22,14 @@ class WolfClient:
     session_id: int or None
     tokens: Tokens or None
     last_access: datetime or None
+    last_failed: bool
 
     def __init__(self, username: str, password: str):
         self.tokens = None
         self.token_auth = TokenAuth(username, password)
         self.session_id = None
         self.last_access = None
+        self.last_failed = False
 
     async def __request(self, method: str, path: str, **kwargs) -> Union[dict, list]:
         await self.__authorize()
@@ -40,12 +42,18 @@ class WolfClient:
             headers = {**bearer_header(self.tokens.access_token), **dict(headers)}
 
         resp = await self.__execute(headers, kwargs, method, path)
-        if resp.status_code == 401:
+        if resp.status_code == 401 or resp.status_code == 500:
+            _LOGGER.debug('Retrying')
             await self.__authorize()
             headers = {**bearer_header(self.tokens.access_token), **dict(headers)}
-            execution = await self.__execute(headers, kwargs, method, path)
-            return execution.json()
+            try:
+                execution = await self.__execute(headers, kwargs, method, path)
+                return execution.json()
+            except FetchFailed as e:
+                self.last_failed = True
+                raise e
         else:
+            self.last_failed = False
             return resp.json()
 
     @staticmethod
@@ -54,7 +62,7 @@ class WolfClient:
             return await client.request(method, f"{BASE_URL}/{path}", **dict(kwargs, headers=Headers(headers)))
 
     async def __authorize(self):
-        if self.tokens is None or datetime.datetime.now() > self.tokens.expire_date:
+        if self.last_failed is True or self.tokens is None or datetime.datetime.now() > self.tokens.expire_date:
             await self.__authorize_and_session()
 
     async def __authorize_and_session(self):
@@ -102,7 +110,11 @@ class WolfClient:
         }
         res = await self.__request('post', 'api/portal/GetParameterValues', json=data,
                                    headers={"Content-Type": "application/json"})
+
         _LOGGER.debug('Fetched values: %s', res)
+
+        if ERROR_CODE in res or ERROR_TYPE in res:
+            raise FetchFailed(res)
 
         self.last_access = res[LAST_ACCESS]
         return [Value(v[VALUE_ID], v[VALUE], v[STATE]) for v in res[VALUES] if VALUE in v]
@@ -141,3 +153,8 @@ class WolfClient:
             return new_params
         else:
             return [WolfClient._map_parameter(p, view[TAB_NAME]) for p in view[PARAMETER_DESCRIPTORS]]
+
+
+class FetchFailed(Exception):
+    """Server returned 500 code with message while executing query"""
+    pass

@@ -26,6 +26,12 @@ GATEWAY_ID = "GatewayId"
 
 LAST_ACCESS = "LastAccess"
 
+TIMESTAMP = "Timestamp"
+
+ERROR_CODE = "ErrorCode"
+
+ERROR_TYPE = "ErrorType"
+
 NAME = 'Name'
 
 PERCENTAGE = '%'
