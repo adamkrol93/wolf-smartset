@@ -19,6 +19,11 @@ class Parameter(ABC):
     def value_id(self):
         ...
 
+    @value_id.setter
+    @abstractmethod
+    def value_id(self, value_id: int):
+        ...
+
     @property
     @abstractmethod
     def name(self):
@@ -35,7 +40,7 @@ class Parameter(ABC):
         ...
 
     def __str__(self) -> str:
-        return "%s -> %s[%d] of %s" % (self.__class__.__name__, self.name, self.value_id, self.parent)
+        return "%s -> %s[%d][%d] of %s" % (self.__class__.__name__, self.name, self.parameter_id, self.value_id, self.parent)
 
 
 class SimpleParameter(Parameter):
@@ -46,6 +51,10 @@ class SimpleParameter(Parameter):
     @property
     def value_id(self):
         return self._value_id
+
+    @value_id.setter
+    def value_id(self, value_id: int):
+        self._value_id = value_id
 
     @property
     def parent(self):
@@ -89,6 +98,10 @@ class Temperature(UnitParameter):
     def value_id(self):
         return self._value_id
 
+    @value_id.setter
+    def value_id(self, value_id: int):
+        self._value_id = value_id
+
     @property
     def parent(self):
         return self._parent
@@ -116,6 +129,10 @@ class Pressure(UnitParameter):
     @property
     def value_id(self):
         return self._value_id
+
+    @value_id.setter
+    def value_id(self, value_id: int):
+        self._value_id = value_id
 
     @property
     def parent(self):
@@ -145,6 +162,10 @@ class HoursParameter(UnitParameter):
     def value_id(self):
         return self._value_id
 
+    @value_id.setter
+    def value_id(self, value_id: int):
+        self._value_id = value_id
+
     @property
     def parent(self):
         return self._parent
@@ -173,6 +194,10 @@ class PercentageParameter(UnitParameter):
     @property
     def value_id(self):
         return self._value_id
+
+    @value_id.setter
+    def value_id(self, value_id: int):
+        self._value_id = value_id
 
     @property
     def parent(self):
@@ -206,6 +231,10 @@ class ListItemParameter(Parameter):
     @property
     def value_id(self):
         return self._value_id
+
+    @value_id.setter
+    def value_id(self, value_id: int):
+        self._value_id = value_id
 
     @property
     def name(self):

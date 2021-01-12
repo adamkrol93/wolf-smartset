@@ -8,7 +8,7 @@ from httpx import Headers
 from wolf_smartset.constants import BASE_URL, ID, GATEWAY_ID, NAME, SYSTEM_ID, MENU_ITEMS, TAB_VIEWS, BUNDLE_ID, \
     BUNDLE, VALUE_ID_LIST, GUI_ID_CHANGED, SESSION_ID, VALUE_ID, VALUE, STATE, VALUES, PARAMETER_ID, UNIT, \
     CELSIUS_TEMPERATURE, BAR, PERCENTAGE, LIST_ITEMS, DISPLAY_TEXT, PARAMETER_DESCRIPTORS, TAB_NAME, HOUR, \
-    LAST_ACCESS, ERROR_CODE, ERROR_TYPE
+    LAST_ACCESS, ERROR_CODE, ERROR_TYPE, ERROR_MESSAGE, ERROR_READ_PARAMETER
 from wolf_smartset.create_session import create_session
 from wolf_smartset.helpers import bearer_header
 from wolf_smartset.models import Temperature, Parameter, SimpleParameter, Device, Pressure, ListItemParameter, \
@@ -114,6 +114,8 @@ class WolfClient:
         _LOGGER.debug('Fetched values: %s', res)
 
         if ERROR_CODE in res or ERROR_TYPE in res:
+            if ERROR_MESSAGE in res and res[ERROR_MESSAGE] == ERROR_READ_PARAMETER:
+                raise ParameterReadError(res)
             raise FetchFailed(res)
 
         self.last_access = res[LAST_ACCESS]
@@ -157,4 +159,8 @@ class WolfClient:
 
 class FetchFailed(Exception):
     """Server returned 500 code with message while executing query"""
+    pass
+
+class ParameterReadError(Exception):
+    """Server returned RedParameterValues error"""
     pass

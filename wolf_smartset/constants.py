@@ -32,6 +32,10 @@ ERROR_CODE = "ErrorCode"
 
 ERROR_TYPE = "ErrorType"
 
+ERROR_READ_PARAMETER = 'internal msg: ReadParameterValues error'
+
+ERROR_MESSAGE = 'Message'
+
 NAME = 'Name'
 
 PERCENTAGE = '%'
