@@ -10,7 +10,7 @@ httpx==0.14.2
 hyperframe==5.2.0
 idna==2.10
 multidict==4.7.6
-PyYAML==5.3.1
+PyYAML==5.4
 rfc3986==1.4.0
 sniffio==1.1.0
 urllib3==1.25.10
