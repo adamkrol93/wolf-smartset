@@ -8,7 +8,7 @@ from httpx import Headers
 from wolf_smartset.constants import BASE_URL, ID, GATEWAY_ID, NAME, SYSTEM_ID, MENU_ITEMS, TAB_VIEWS, BUNDLE_ID, \
     BUNDLE, VALUE_ID_LIST, GUI_ID_CHANGED, SESSION_ID, VALUE_ID, VALUE, STATE, VALUES, PARAMETER_ID, UNIT, \
     CELSIUS_TEMPERATURE, BAR, PERCENTAGE, LIST_ITEMS, DISPLAY_TEXT, PARAMETER_DESCRIPTORS, TAB_NAME, HOUR, \
-    LAST_ACCESS, ERROR_CODE, ERROR_TYPE, ERROR_MESSAGE, ERROR_READ_PARAMETER
+    LAST_ACCESS, ERROR_CODE, ERROR_TYPE, ERROR_MESSAGE, ERROR_READ_PARAMETER, SYSTEM_LIST, GATEWAY_STATE, IS_ONLINE
 from wolf_smartset.create_session import create_session
 from wolf_smartset.helpers import bearer_header
 from wolf_smartset.models import Temperature, Parameter, SimpleParameter, Device, Pressure, ListItemParameter, \
@@ -76,6 +76,19 @@ class WolfClient:
         _LOGGER.debug('Fetched systems: %s', system_list)
         return [Device(system[ID], system[GATEWAY_ID], system[NAME]) for system in system_list]
 
+    # api/portal/GetSystemStateList
+    async def fetch_system_state_list(self, system_id, gateway_id) -> bool:
+        payload = {SESSION_ID: self.session_id, SYSTEM_LIST: [{SYSTEM_ID: system_id, GATEWAY_ID: gateway_id}]}
+        system_state_response = await self.__request('post', 'api/portal/GetSystemStateList', json=payload)
+        _LOGGER.debug('Fetched system state: %s', system_state_response)
+        return system_state_response[0][GATEWAY_STATE][IS_ONLINE]
+
+    # api/portal/UpdateSession
+    async def update_session(self):
+        payload = {SESSION_ID: self.session_id}
+        update_session_response = await self.__request('post', 'api/portal/UpdateSession', json=payload)
+        _LOGGER.debug('Update session response: %s', update_session_response)
+
     # api/portal/GetGuiDescriptionForGateway?GatewayId={gateway_id}&SystemId={system_id}
     async def fetch_parameters(self, gateway_id, system_id) -> [Parameter]:
         payload = {GATEWAY_ID: gateway_id, SYSTEM_ID: system_id}
@@ -96,6 +109,14 @@ class WolfClient:
                     flattened.append(val)
         return flattened
 
+    # api/portal/CloseSystem
+    async def close_system(self):
+        data = {
+            SESSION_ID: self.session_id
+        }
+        res = await self.__request('post', 'api/portal/CloseSystem', json=data)
+        _LOGGER.debug('Close system response: %s', res)
+
     # api/portal/GetParameterValues
     async def fetch_value(self, gateway_id, system_id, parameters: [Parameter]):
         data = {
@@ -104,7 +125,7 @@ class WolfClient:
             VALUE_ID_LIST: [param.value_id for param in parameters],
             GATEWAY_ID: gateway_id,
             SYSTEM_ID: system_id,
-            GUI_ID_CHANGED: True,
+            GUI_ID_CHANGED: False,
             SESSION_ID: self.session_id,
             LAST_ACCESS: self.last_access
         }

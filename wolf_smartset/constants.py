@@ -65,3 +65,9 @@ UNIT = 'Unit'
 TAB_NAME = 'TabName'
 
 VALUE_ID = 'ValueId'
+
+SYSTEM_LIST = 'SystemList'
+
+GATEWAY_STATE = 'GatewayState'
+
+IS_ONLINE = 'IsOnline'

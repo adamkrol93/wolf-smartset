@@ -5,10 +5,10 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='wolf_smartset',
-    version='0.1.10',
+    version='0.1.11',
     author="Adam Krol",
     author_email="adam.krol93@gmail.com",
-    description="A package to comunicate with Wolf Smart Set Cloud",
+    description="A package to communicate with Wolf Smart Set Cloud",
     long_description=long_description,
     package_data={"wolf_smartset": ["py.typed"]},
     long_description_content_type="text/markdown",
