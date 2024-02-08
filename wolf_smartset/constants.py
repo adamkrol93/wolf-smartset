@@ -2,7 +2,13 @@
 File with all constants
 """
 
-BASE_URL = "https://www.wolf-smartset.com/portal"
+BASE_URL = "https://www.wolf-smartset.com"
+
+BASE_URL_PORTAL = "https://www.wolf-smartset.com/portal"
+
+AUTHENTICATION_URL = "/idsrv"
+AUTHENTICATION_BASE_URL = BASE_URL + AUTHENTICATION_URL
+AUTHENTICATION_CLIENT = "smartset.web"
 
 SESSION_ID = 'SessionId'
 

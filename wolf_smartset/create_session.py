@@ -11,7 +11,7 @@ async def create_session(session: AsyncClient, token: str):
     data = {
         TIMESTAMP: datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
-    resp = await session.post(constants.BASE_URL + "/api/portal/CreateSession2",
+    resp = await session.post(constants.BASE_URL_PORTAL + "/api/portal/CreateSession2",
                               headers=Headers({**bearer_header(token),
                                                **{"Content-Type": "application/json"}}),
                               json=data)

@@ -5,7 +5,7 @@ import httpx
 import logging
 from httpx import Headers
 
-from wolf_smartset.constants import BASE_URL, ID, GATEWAY_ID, NAME, SYSTEM_ID, MENU_ITEMS, TAB_VIEWS, BUNDLE_ID, \
+from wolf_smartset.constants import BASE_URL_PORTAL, ID, GATEWAY_ID, NAME, SYSTEM_ID, MENU_ITEMS, TAB_VIEWS, BUNDLE_ID, \
     BUNDLE, VALUE_ID_LIST, GUI_ID_CHANGED, SESSION_ID, VALUE_ID, VALUE, STATE, VALUES, PARAMETER_ID, UNIT, \
     CELSIUS_TEMPERATURE, BAR, PERCENTAGE, LIST_ITEMS, DISPLAY_TEXT, PARAMETER_DESCRIPTORS, TAB_NAME, HOUR, \
     LAST_ACCESS, ERROR_CODE, ERROR_TYPE, ERROR_MESSAGE, ERROR_READ_PARAMETER, SYSTEM_LIST, GATEWAY_STATE, IS_ONLINE
@@ -59,7 +59,7 @@ class WolfClient:
     @staticmethod
     async def __execute(headers, kwargs, method, path):
         async with httpx.AsyncClient() as client:
-            return await client.request(method, f"{BASE_URL}/{path}", **dict(kwargs, headers=Headers(headers)))
+            return await client.request(method, f"{BASE_URL_PORTAL}/{path}", **dict(kwargs, headers=Headers(headers)))
 
     async def __authorize(self):
         if self.last_failed is True or self.tokens is None or datetime.datetime.now() > self.tokens.expire_date:

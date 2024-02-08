@@ -1,1 +1,4 @@
-httpx==0.14.2
+httpx
+lxml
+pkce
+uuid
