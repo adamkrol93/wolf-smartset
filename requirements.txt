@@ -1,4 +1,4 @@
 httpx
 lxml
 pkce
-uuid
+shortuuid

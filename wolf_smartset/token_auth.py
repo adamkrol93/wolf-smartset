@@ -7,7 +7,7 @@ from wolf_smartset import constants
 
 from lxml import html
 import pkce
-import uuid
+import shortuuid
 
 
 
@@ -34,7 +34,7 @@ class TokenAuth:
         
         # Generate client-sided variables for OpenID
         code_verifier, code_challenge = pkce.generate_pkce_pair()
-        state = uuid.uuid4().hex
+        state = shortuuid.uuid()
       
 
         # Retrieve verification token from WOLF website
