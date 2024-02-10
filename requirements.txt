@@ -1,4 +1,4 @@
-httpx
-lxml
-pkce
-shortuuid
+httpx==0.14.0
+lxml==5.1.0
+pkce==1.0.3
+shortuuid==1.0.11
