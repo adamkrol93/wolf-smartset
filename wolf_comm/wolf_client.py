@@ -5,15 +5,15 @@ import httpx
 import logging
 from httpx import Headers
 
-from wolf_smartset.constants import BASE_URL_PORTAL, ID, GATEWAY_ID, NAME, SYSTEM_ID, MENU_ITEMS, TAB_VIEWS, BUNDLE_ID, \
+from wolf_comm.constants import BASE_URL_PORTAL, ID, GATEWAY_ID, NAME, SYSTEM_ID, MENU_ITEMS, TAB_VIEWS, BUNDLE_ID, \
     BUNDLE, VALUE_ID_LIST, GUI_ID_CHANGED, SESSION_ID, VALUE_ID, VALUE, STATE, VALUES, PARAMETER_ID, UNIT, \
     CELSIUS_TEMPERATURE, BAR, PERCENTAGE, LIST_ITEMS, DISPLAY_TEXT, PARAMETER_DESCRIPTORS, TAB_NAME, HOUR, \
     LAST_ACCESS, ERROR_CODE, ERROR_TYPE, ERROR_MESSAGE, ERROR_READ_PARAMETER, SYSTEM_LIST, GATEWAY_STATE, IS_ONLINE
-from wolf_smartset.create_session import create_session
-from wolf_smartset.helpers import bearer_header
-from wolf_smartset.models import Temperature, Parameter, SimpleParameter, Device, Pressure, ListItemParameter, \
+from wolf_comm.create_session import create_session
+from wolf_comm.helpers import bearer_header
+from wolf_comm.models import Temperature, Parameter, SimpleParameter, Device, Pressure, ListItemParameter, \
     PercentageParameter, Value, ListItem, HoursParameter
-from wolf_smartset.token_auth import Tokens, TokenAuth
+from wolf_comm.token_auth import Tokens, TokenAuth
 
 _LOGGER = logging.getLogger(__name__)
 

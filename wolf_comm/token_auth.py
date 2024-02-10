@@ -3,7 +3,7 @@ import logging
 
 from httpx import AsyncClient
 
-from wolf_smartset import constants
+from wolf_comm import constants
 
 from lxml import html
 import pkce

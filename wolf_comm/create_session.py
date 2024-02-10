@@ -2,9 +2,9 @@ from datetime import datetime
 
 from httpx import AsyncClient, Headers
 
-from wolf_smartset import constants
-from wolf_smartset.constants import TIMESTAMP
-from wolf_smartset.helpers import bearer_header
+from wolf_comm import constants
+from wolf_comm.constants import TIMESTAMP
+from wolf_comm.helpers import bearer_header
 
 
 async def create_session(session: AsyncClient, token: str):

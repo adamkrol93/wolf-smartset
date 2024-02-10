@@ -4,15 +4,15 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name='wolf_smartset',
-    version='0.1.11',
-    author="Adam Krol",
-    author_email="adam.krol93@gmail.com",
-    description="A package to communicate with Wolf Smart Set Cloud",
+    name='wolf_comm',
+    version='0.0.1',
+    author="Jan Rothkegel",
+    author_email="jan.rothkegel@web.de",
+    description="A package to communicate with Wolf SmartSet Cloud",
     long_description=long_description,
-    package_data={"wolf_smartset": ["py.typed"]},
+    package_data={"wolf_comm": ["py.typed"]},
     long_description_content_type="text/markdown",
-    url="https://github.com/adamkrol93/wolf-smartset",
+    url="https://github.com/janrothkegel/wolf-comm",
     include_package_data=True,
     packages=setuptools.find_packages(),
     classifiers=[
@@ -20,6 +20,9 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        'httpx'
+        'httpx',
+        'lxml',
+        'pkce',
+        'shortuuid'
     ]
 )
