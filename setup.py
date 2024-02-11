@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='wolf_comm',
-    version='0.0.1',
+    version='0.0.2',
     author="Jan Rothkegel",
     author_email="jan.rothkegel@web.de",
     description="A package to communicate with Wolf SmartSet Cloud",
