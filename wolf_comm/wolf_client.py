@@ -32,7 +32,7 @@ class WolfClient:
         self.last_failed = False
 
     async def __request(self, method: str, path: str, **kwargs) -> Union[dict, list]:
-        await self.__authorize()
+        await self.__authorize_and_session()
 
         headers = kwargs.get('headers')
 
@@ -44,7 +44,7 @@ class WolfClient:
         resp = await self.__execute(headers, kwargs, method, path)
         if resp.status_code == 401 or resp.status_code == 500:
             _LOGGER.debug('Retrying')
-            await self.__authorize()
+            await self.__authorize_and_session()
             headers = {**bearer_header(self.tokens.access_token), **dict(headers)}
             try:
                 execution = await self.__execute(headers, kwargs, method, path)
@@ -60,10 +60,6 @@ class WolfClient:
     async def __execute(headers, kwargs, method, path):
         async with httpx.AsyncClient() as client:
             return await client.request(method, f"{BASE_URL_PORTAL}/{path}", **dict(kwargs, headers=Headers(headers)))
-
-    async def __authorize(self):
-        if self.last_failed is True or self.tokens is None or datetime.datetime.now() > self.tokens.expire_date:
-            await self.__authorize_and_session()
 
     async def __authorize_and_session(self):
         async with httpx.AsyncClient() as session:
@@ -83,11 +79,6 @@ class WolfClient:
         _LOGGER.debug('Fetched system state: %s', system_state_response)
         return system_state_response[0][GATEWAY_STATE][IS_ONLINE]
 
-    # api/portal/UpdateSession
-    async def update_session(self):
-        payload = {SESSION_ID: self.session_id}
-        update_session_response = await self.__request('post', 'api/portal/UpdateSession', json=payload)
-        _LOGGER.debug('Update session response: %s', update_session_response)
 
     # api/portal/GetGuiDescriptionForGateway?GatewayId={gateway_id}&SystemId={system_id}
     async def fetch_parameters(self, gateway_id, system_id) -> [Parameter]:
